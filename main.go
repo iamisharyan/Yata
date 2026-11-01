@@ -36,6 +36,10 @@ func (m model) refreshpanes()model{
 		entries:readDir(filepath.Dir(m.cwd)),
 
 	}
+	m.parent=pane{
+		path:filepath.Dir(m.cwd),
+		entries:readDir(filepath.Dir(m.cwd)),
+	}
 	for i,e:=range m.parent.entries{
 		if e.name==filepath.Base(m.cwd){
 			m.parent.cursor=i
@@ -96,8 +100,8 @@ func (m model) Update(msg tea.Msg)(tea.Model,tea.Cmd){
 		switch key{
 		case "q","ctrl+c":
 			return m,tea.Quit
-		case "j","down":
-			if m.cursor<len(m.current.entries)-1{
+		case "down","j":
+			if m.cursor<len(m.entries)-1{
 				m.cursor++
 			}
 		case "k","up":
