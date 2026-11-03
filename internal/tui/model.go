@@ -11,9 +11,11 @@ import (
 	"term2/internal/preview"
 
 	tea "github.com/charmbracelet/bubbletea"
+	
+	
 )
 
-
+const windowTitle="vicious"
 type Pane struct {
 	Path    string
 	Entries []fs.Entry
@@ -33,6 +35,8 @@ type Model struct {
 	showHidden  bool
 	height      int
 	width       int
+	fileListY   int 
+	
 }
 
 
@@ -90,6 +94,7 @@ func (m Model) RefreshPanes() (Model, tea.Cmd) {
 	m.preview = Pane{}
 	m.previewText = ""
 	m.previewPath = ""
+	m.fileListY=3
 
 	if len(m.current.Entries) == 0 || m.current.Cursor >= len(m.current.Entries) {
 		return m, nil

@@ -1,6 +1,7 @@
 package tui
 
 import (
+	
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -8,6 +9,7 @@ import (
 )
 
 func (m Model) View() string {
+	
 	if m.width == 0 || m.height == 0 {
 		return "Loading..."
 	}
@@ -44,8 +46,10 @@ func (m Model) View() string {
 		Foreground(theme.DimColor).
 		Padding(0, 1).
 		Render("CWD: " + m.cwd + "  •  [q] Quit  [h/j/k/l] Navigate  [.] Toggle Hidden")
+		
 
 	return lipgloss.JoinVertical(lipgloss.Left, columns, statusBar)
+
 }
 
 func renderDirPane(p Pane, width, height int, active bool) string {
@@ -87,6 +91,7 @@ func renderDirPane(p Pane, width, height int, active bool) string {
 	}
 
 	return theme.PaneStyle(width, height, active).Render(b.String())
+	
 }
 
 func renderTextPreview(content string, width, height int) string {

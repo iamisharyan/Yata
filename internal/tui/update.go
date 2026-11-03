@@ -1,6 +1,7 @@
 package tui
 
 import (
+	
 	"path/filepath"
 	"term2/internal/fs"
 
@@ -30,6 +31,29 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// 		m.err=msg.err
 	// 		return m,nil
 	// 	}
+	case tea.MouseMsg:
+		 
+		switch msg.Button{
+		case tea.MouseButtonLeft:
+			if msg.Action==tea.MouseActionPress{
+				crow:=msg.Y -m.fileListY
+
+				if crow>=0 && crow<len(m.current.Entries) {
+					m.current.Cursor=crow
+					
+				}
+
+			}
+		case tea.MouseButtonRight:
+			if msg.Action==tea.MouseActionPress{
+				crow:=msg.Y-m.fileListY
+
+				if crow>=0 && crow<len(m.current.Entries){
+					m.current.Cursor=crow
+				}
+			}
+		}
+		return m ,nil
 
 	case previewLoadedMsg:
 		if msg.path == m.SelectedPath() {
@@ -114,6 +138,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// 	return m,pdffile(path)
 			// }
 			return m,openinNvim(path)
+
+			
 
 
 		case ".":
