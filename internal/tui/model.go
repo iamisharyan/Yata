@@ -2,11 +2,13 @@ package tui
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 
-	tea "github.com/charmbracelet/bubbletea"
 	"term2/internal/fs"
 	"term2/internal/preview"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 
@@ -165,4 +167,14 @@ func loadPreviewCmd(path string) tea.Cmd {
 			err:     err,
 		}
 	}
+}
+
+func openinNvim(path string)tea.Cmd{
+	c:=exec.Command("nvim",path)
+	return tea.ExecProcess(c,func(err error)tea.Msg{
+		return editorFinishingmsg{err:err}
+	})
+}
+type editorFinishingmsg struct{
+	err error
 }

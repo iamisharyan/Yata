@@ -1,11 +1,15 @@
 package tui
 
 import (
-	tea "github.com/charmbracelet/bubbletea"
+	"path/filepath"
 	"term2/internal/fs"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
-
+// type editorFinishedMsg struct{
+// 	err error
+// }
 func (m Model) Init() tea.Cmd {
 	return nil
 }
@@ -20,6 +24,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 		m, cmd = m.RefreshPanes()
 		return m, cmd
+
+	// case editorFinishedMsg:
+	// 	if msg.err!=nil{
+	// 		m.err=msg.err
+	// 		return m,nil
+	// 	}
 
 	case previewLoadedMsg:
 		if msg.path == m.SelectedPath() {
@@ -87,6 +97,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+u", "o":
 			m.current.Cursor = max(m.current.Cursor-10, 0)
 			m, cmd = m.RefreshPanes()
+
+		case "n":
+			selected:=m.current.Entries[m.current.Cursor]
+			if !selected.IsDir{
+				path:=filepath.Join(m.cwd,selected.Name)
+				return m,openinNvim(path)
+			}
 
 		case ".":
 			m.showHidden = !m.showHidden
