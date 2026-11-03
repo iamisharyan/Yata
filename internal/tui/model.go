@@ -170,7 +170,12 @@ func loadPreviewCmd(path string) tea.Cmd {
 }
 
 func openinNvim(path string)tea.Cmd{
-	c:=exec.Command("nvim",path)
+	editor:=os.Getenv("EDITOR")
+
+	if editor==""{
+		editor="code"
+	}
+	c:=exec.Command(editor,path)
 	return tea.ExecProcess(c,func(err error)tea.Msg{
 		return editorFinishingmsg{err:err}
 	})
