@@ -100,10 +100,21 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "n":
 			selected:=m.current.Entries[m.current.Cursor]
-			if !selected.IsDir{
-				path:=filepath.Join(m.cwd,selected.Name)
-				return m,openinNvim(path)
+			if selected.IsDir{
+				return m,nil
 			}
+			path:=filepath.Join(m.cwd,selected.Name)
+			if imagefile(selected.Name){
+				return m,openimage(path)
+			}
+			if isdocfile(selected.Name){
+				return m,docfile(path)
+			}
+			// if ispdffile(selected.Name){
+			// 	return m,pdffile(path)
+			// }
+			return m,openinNvim(path)
+
 
 		case ".":
 			m.showHidden = !m.showHidden

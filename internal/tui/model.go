@@ -1,9 +1,11 @@
 package tui
 
 import (
+	
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"term2/internal/fs"
 	"term2/internal/preview"
@@ -173,13 +175,80 @@ func openinNvim(path string)tea.Cmd{
 	editor:=os.Getenv("EDITOR")
 
 	if editor==""{
-		editor="code"
+		editor="nvim"
 	}
 	c:=exec.Command(editor,path)
 	return tea.ExecProcess(c,func(err error)tea.Msg{
 		return editorFinishingmsg{err:err}
 	})
 }
+func imagefile(name string)bool{
+	ext:=strings.ToLower(filepath.Ext(name))
+	switch ext{
+		case ".png",".jpg",".jpeg",".gif",".bmp",
+		".webp",".tiff",".ico":
+		return true
+	}
+	return false
+}
+func openimage(path string) tea.Cmd{
+	cmd:=exec.Command(
+		"cmd",
+		"/c",
+		"start",
+		"",
+		path,
+
+	)
+	return tea.ExecProcess(cmd,func(err error)tea.Msg{
+		return editorFinishingmsg{err:err}
+	})
+}
+func isdocfile(name string)bool{
+	ext:=strings.ToLower(filepath.Ext(name))
+	switch ext{
+		case ".doc",".docx",".docm",".dot",".dotx",
+		".rtf",".odt",".dotm",".pdf":
+		return true
+	}
+	return false
+}
+func  docfile(path string) tea.Cmd{
+	cmd:=exec.Command(
+		"cmd",
+		"/c",
+		"start",
+		"",
+		path,
+
+	)
+	return tea.ExecProcess(cmd,func(err error)tea.Msg{
+		return editorFinishingmsg{err:err}
+	})
+}
+
+// func ispdffile(name string)bool{
+// 	ext:=strings.ToLower(filepath.Ext(name))
+// 	switch ext{
+// 		case ".pdf":
+// 		return true
+// 	}
+// 	return false
+// }
+// func pdffile(path string) tea.Cmd{
+	
+		
+// c:=os.Getenv("PDFOPENER")
+// if c==""{
+// 	c="brave"
+// }
+// cmd:=exec.Command(c,path)
+// 	return tea.ExecProcess(cmd,func(err error)tea.Msg{
+// 		return editorFinishingmsg{err:err}
+// 	})
+// }
+
+
 type editorFinishingmsg struct{
 	err error
 }
