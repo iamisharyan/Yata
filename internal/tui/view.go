@@ -4,7 +4,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
 	"term2/internal/preview"
 	"term2/internal/theme"
 "github.com/charmbracelet/x/ansi"
@@ -136,12 +135,15 @@ func truncate(s string, maxRunes int) string {
 	return s
 }
 func(m Model)renderpreview(path string)string{
+
+	if preview.IsBinary(path){
+		return "binary file"
+	}
 e:= strings.ToLower(filepath.Ext(path))
 
 switch e{
-case ".exe":
-	return "binary file can't preview"
-	
+
+
 	case ".go",".c",".cpp",".h",".rs",".ts",".js",
 	".py",".html",".css",".json",".yml",".toml",".sh",
 	".sql",".java":

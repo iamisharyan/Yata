@@ -7,6 +7,8 @@ import (
 	"io"
 	"os"
 	"strings"
+	"unicode/utf8"
+	
 
 	"github.com/alecthomas/chroma/v2/formatters"
 	"github.com/alecthomas/chroma/v2/lexers"
@@ -93,4 +95,30 @@ func Highlightfile(path string)(string ,error){
 		return "",err
 	}
 	return output.String(),nil
+}
+func IsBinary(path string)bool{
+	file,err:=os.Open(path)
+	if err!=nil{
+		return true
+
+	}
+	defer file.Close()
+	buf:=make([]byte,8192)
+	n,err:=file.Read(buf)
+	if err!=nil && err!=io.EOF{
+		return true
+	}
+	data:=buf[:n]
+	if !utf8.Valid(data){
+		return true
+	}
+	for _,b:=range data{
+		if b==0{
+			return true
+		}
+		if b<32 && b!='\n'&& b!='\r'&&b!='\t'&&b!='\f'{
+			return true
+		}
+	}
+	return false
 }
