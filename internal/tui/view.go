@@ -1,11 +1,14 @@
 package tui
 
 import (
-	
+	"os"
+	"path/filepath"
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
+	"term2/internal/preview"
 	"term2/internal/theme"
+"github.com/charmbracelet/x/ansi"
+	"github.com/charmbracelet/lipgloss"
 )
 
 func (m Model) View() string {
@@ -33,7 +36,9 @@ func (m Model) View() string {
 		if sel.IsDir {
 			previewView = renderDirPane(m.preview, colWidth, paneHeight, false)
 		} else {
-			previewView = renderTextPreview(m.previewText, colWidth, paneHeight)
+			path:=filepath.Join(m.cwd,sel.Name)
+			content:=m.renderpreview(path)
+			previewView = renderTextPreview(content, colWidth, paneHeight)
 		}
 	} else {
 		previewView = renderTextPreview("", colWidth, paneHeight)
@@ -112,7 +117,7 @@ func renderTextPreview(content string, width, height int) string {
 		if count >= visible {
 			break
 		}
-		b.WriteString(truncate(l, innerWidth) + "\n")
+		b.WriteString(ansi.Truncate(l, innerWidth,"") + "\n")
 		count++
 	}
 
@@ -129,4 +134,29 @@ func truncate(s string, maxRunes int) string {
 		return string(r[:maxRunes])
 	}
 	return s
+}
+func(m Model)renderpreview(path string)string{
+e:= strings.ToLower(filepath.Ext(path))
+
+switch e{
+case ".exe":
+	return "binary file can't preview"
+	
+	case ".go",".c",".cpp",".h",".rs",".ts",".js",
+	".py",".html",".css",".json",".yml",".toml",".sh",
+	".sql",".java":
+	content,err:=preview.Highlightfile(path)
+	if err!=nil{
+		return "preview error:"+err.Error()
+	}
+	return content
+
+default:
+	content ,err:=os.ReadFile(path)
+
+	if err!=nil{
+		return "preview error"+err.Error()
+	}
+	return string(content)
+}
 }

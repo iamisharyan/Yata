@@ -2,9 +2,15 @@ package preview
 
 import (
 	"bufio"
+	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"strings"
+
+	"github.com/alecthomas/chroma/v2/formatters"
+	"github.com/alecthomas/chroma/v2/lexers"
+	"github.com/alecthomas/chroma/v2/styles"
 )
 const MaxPreviewLines = 200
 
@@ -53,4 +59,38 @@ func isBinary(f *os.File) (bool, error) {
 		}
 	}
 	return false, nil
+}
+func Highlightfile(path string)(string ,error){
+	c,err:=os.ReadFile(path)
+	if err!=nil{
+		return "",err
+	}
+	for _,b:=range c{
+		if b==0{
+			return "",fmt.Errorf("binary file cant be highlighted")
+		}
+	}
+	lexer:=lexers.Match(path)
+	if lexer == nil{
+		lexer=lexers.Fallback
+	}
+	it,err:=lexer.Tokenise(nil,string(c))
+
+	if err!=nil{
+		return "",err
+	}
+
+	formatter:=formatters.Get("terminal256")
+	if formatter==nil{
+		return "",fmt.Errorf("terminal formatter unavailable")
+
+	}
+	style :=styles.Get("monkai")
+
+	var output bytes.Buffer
+	err=formatter.Format(&output,style,it)
+	if err!=nil{
+		return "",err
+	}
+	return output.String(),nil
 }

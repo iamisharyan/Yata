@@ -108,6 +108,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "h", "left":
 			m, cmd = m.GoToParent()
+			
 
 		case "enter", "l", "right":
 			m, cmd = m.EnterSelected()
