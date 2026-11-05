@@ -81,6 +81,24 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		switch key {
+		case "f":
+			if m.fullscreen{
+				m.fullscreen=false
+				return m,nil
+			}
+			if len(m.current.Entries)>0&&m.current.Cursor<len(m.current.Entries){
+				sel:=m.current.Entries[m.current.Cursor]
+				if !sel.IsDir{
+					m.fullscreen=true
+				}
+
+			}
+			return m,nil
+		case "esc":
+			if m.fullscreen{
+				m.fullscreen=false
+				return m,nil
+			}
 		case "q", "ctrl+c":
 			return m, tea.Quit
 

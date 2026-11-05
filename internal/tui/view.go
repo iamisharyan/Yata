@@ -1,29 +1,39 @@
 package tui
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"term2/internal/preview"
 	"term2/internal/theme"
-"github.com/charmbracelet/x/ansi"
+
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/x/ansi"
 )
 
 func (m Model) View() string {
+	if m.fullscreen{
+		return lipgloss.NewStyle().
+        Width(m.width).
+        Height(m.height).
+        Padding(1).
+        Render(m.previewText)
 	
+		
+	}
 	if m.width == 0 || m.height == 0 {
 		return "Loading..."
 	}
 
-	colWidth := m.width / 3
-	if colWidth < 10 {
-		colWidth = 10
+	colWidth:=m.width/3
+	if colWidth<10 {
+		colWidth=10
 	}
 
-	paneHeight := m.height - 4
-	if paneHeight < 5 {
-		paneHeight = 5
+	paneHeight:=m.height-4
+	if paneHeight<5{
+		paneHeight= 5
 	}
 
 	parentView := renderDirPane(m.parent, colWidth, paneHeight, false)
@@ -45,11 +55,19 @@ func (m Model) View() string {
 
 	columns := lipgloss.JoinHorizontal(lipgloss.Top, parentView, currentView, previewView)
 
-	
+	permissions:="N/A"
+	selectedname:="None"
+
+	if len(m.current.Entries)>0&&m.current.Cursor<len(m.current.Entries){
+		sel:=m.current.Entries[m.current.Cursor]
+		selectedname=sel.Name
+		path:=filepath.Join(m.cwd,sel.Name)
+		permissions=getpermissions(path)
+	}
 	statusBar := lipgloss.NewStyle().
 		Foreground(theme.DimColor).
 		Padding(0, 1).
-		Render("CWD: " + m.cwd + "  •  [q] Quit  [h/j/k/l] Navigate  [.] Toggle Hidden")
+		Render("cwd:"+m.cwd,"          •",selectedname,"         •",permissions,"         •[q]Quit")
 		
 
 	return lipgloss.JoinVertical(lipgloss.Left, columns, statusBar)
@@ -161,4 +179,12 @@ default:
 	}
 	return string(content)
 }
+}
+func getpermissions(path string)string{
+	info,err:=os.Lstat(path)
+	if err!=nil{
+		return "N/A"
+	}
+	mode:=info.Mode().Perm()
+	return fmt.Sprintf("%s(%04o)",mode.String(),mode)
 }

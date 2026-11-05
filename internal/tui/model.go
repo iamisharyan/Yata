@@ -15,7 +15,7 @@ import (
 	
 )
 
-const windowTitle="vicious"
+
 type Pane struct {
 	Path    string
 	Entries []fs.Entry
@@ -36,6 +36,7 @@ type Model struct {
 	height      int
 	width       int
 	fileListY   int 
+	fullscreen  bool
 	
 }
 
