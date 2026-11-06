@@ -4,8 +4,10 @@ import (
 	
 	"path/filepath"
 	"term2/internal/fs"
+	 tea "github.com/charmbracelet/bubbletea"
+	
+	
 
-	tea "github.com/charmbracelet/bubbletea"
 )
 
 // type editorFinishedMsg struct{
@@ -23,6 +25,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
+		m.resizepreview()
+		
+		
+
 		m, cmd = m.RefreshPanes()
 		return m, cmd
 
@@ -32,8 +38,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// 		return m,nil
 	// 	}
 	case tea.MouseMsg:
+		if m.fullscreen{
+				var cmd tea.Cmd
+				m.previewX,cmd=m.previewX.Update(msg)
+				return m,cmd
+			}
 		 
 		switch msg.Button{
+		case tea.MouseButtonWheelDown:
+			m.previewX.ScrollDown(3)
+		case tea.MouseButtonWheelUp:
+			m.previewX.ScrollUp(3)
 		case tea.MouseButtonLeft:
 			if msg.Action==tea.MouseActionPress{
 				crow:=msg.Y -m.fileListY
@@ -45,6 +60,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			}
 		case tea.MouseButtonRight:
+			
+
+
 			if msg.Action==tea.MouseActionPress{
 				crow:=msg.Y-m.fileListY
 
@@ -60,16 +78,36 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if msg.err != nil {
 				m.previewText = "[error reading file]"
 			} else {
-				m.previewText = msg.content
+				m.previewText = m.renderpreview(msg.path)
 			}
 			m.previewPath = msg.path
+			m.previewX.SetContent(m.previewText)
+			m.previewX.GotoTop()
 		}
 		return m, nil
 
 	case tea.KeyMsg:
 		key := msg.String()
 
-		
+		if m.fullscreen {
+    switch key {
+    case "alt+1":
+        m.previewX.ScrollDown(1)
+        return m, nil
+
+    case "alt+2":
+        m.previewX.ScrollUp(1)
+        return m, nil
+
+    case "0":
+        m.previewX.HalfPageDown()
+        return m, nil
+
+    case "9":
+        m.previewX.HalfPageUp()
+        return m, nil
+    }
+}
 		if m.pendingG {
 			m.pendingG = false
 			if key == "g" {
@@ -84,7 +122,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "f":
 			if m.fullscreen{
 				m.fullscreen=false
-				return m,nil
+				
 			}
 			if len(m.current.Entries)>0&&m.current.Cursor<len(m.current.Entries){
 				sel:=m.current.Entries[m.current.Cursor]
@@ -93,10 +131,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 
 			}
+			m.resizepreview()
 			return m,nil
 		case "esc":
 			if m.fullscreen{
 				m.fullscreen=false
+				m.resizepreview()
 				return m,nil
 			}
 		case "q", "ctrl+c":

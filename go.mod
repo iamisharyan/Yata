@@ -4,12 +4,23 @@ go 1.26.0
 
 require (
 	github.com/alecthomas/chroma/v2 v2.27.0
+	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/charmbracelet/x/ansi v0.11.9
 )
 
 require (
+	charm.land/bubbletea/v2 v2.1.1 // indirect
+	charm.land/lipgloss/v2 v2.0.5 // indirect
+	github.com/charmbracelet/ultraviolet v0.0.0-20261008173134-6b8d4baf91b4 // indirect
+	github.com/charmbracelet/x/termios v0.1.1 // indirect
+	github.com/charmbracelet/x/windows v0.2.2 // indirect
+	golang.org/x/sync v0.22.0 // indirect
+)
+
+require (
+	charm.land/bubbles/v2 v2.2.1
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
 	github.com/charmbracelet/x/cellbuf v0.0.15 // indirect

@@ -1,7 +1,6 @@
 package tui
 
 import (
-	
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -11,8 +10,7 @@ import (
 	"term2/internal/preview"
 
 	tea "github.com/charmbracelet/bubbletea"
-	
-	
+	"github.com/charmbracelet/bubbles/viewport"
 )
 
 
@@ -37,15 +35,18 @@ type Model struct {
 	width       int
 	fileListY   int 
 	fullscreen  bool
+	previewX viewport.Model
 	
 }
 
 
 func InitialModel() Model {
 	cwd, _ := os.Getwd()
+	vp:=viewport.New(0,0)
 	m := Model{
 		cwd:        cwd,
 		showHidden: false,
+		previewX: vp,
 	}
 	m.current = Pane{
 		Path:    cwd,
@@ -257,4 +258,21 @@ func  docfile(path string) tea.Cmd{
 
 type editorFinishingmsg struct{
 	err error
+}
+func (m *Model) resizepreview() {
+    var width, height int
+
+    if m.fullscreen {
+        width = m.width - 2
+        height = m.height - 2
+    } else {
+        colWidth := m.width / 3
+        paneHeight := m.height - 4
+
+        width = colWidth - 4
+        height = paneHeight - 2
+    }
+
+    m.previewX.Width=max(width, 1)
+    m.previewX.Height=max(height, 1)
 }

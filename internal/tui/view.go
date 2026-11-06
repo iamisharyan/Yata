@@ -18,7 +18,7 @@ func (m Model) View() string {
         Width(m.width).
         Height(m.height).
         Padding(1).
-        Render(m.previewText)
+        Render(m.previewX.View())
 	
 		
 	}
@@ -45,9 +45,14 @@ func (m Model) View() string {
 		if sel.IsDir {
 			previewView = renderDirPane(m.preview, colWidth, paneHeight, false)
 		} else {
-			path:=filepath.Join(m.cwd,sel.Name)
-			content:=m.renderpreview(path)
-			previewView = renderTextPreview(content, colWidth, paneHeight)
+			// path:=filepath.Join(m.cwd,sel.Name)
+			// content:=m.renderpreview(path)
+			// previewView = renderTextPreview(content, colWidth, paneHeight)
+			previewView=theme.PaneStyle(
+				colWidth,
+				paneHeight,
+				false,
+			).Render(m.previewX.View())
 		}
 	} else {
 		previewView = renderTextPreview("", colWidth, paneHeight)
