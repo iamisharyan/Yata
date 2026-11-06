@@ -10,9 +10,13 @@ var (
 	DirColor = lipgloss.Color("33")
 	FileColor = lipgloss.Color("252")
 	DimColor = lipgloss.Color("243")
-	CursorStyle = lipgloss.NewStyle().
-			Reverse(true).
-			Bold(true)
+	// CursorStyle = lipgloss.NewStyle().
+	// 		Reverse(true).
+	// 		Bold(true)
+    CursorIndicator="> "
+	CursorIndicatorEmpty=" "
+	CursorIndicatorStyle=lipgloss.NewStyle().Foreground(lipgloss.Color("212")).Bold(true)
+	
 )
 
 

@@ -12,7 +12,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
 )
-
+var pointer string
 func (m Model) View() string {
 	if m.fullscreen{
 		return lipgloss.NewStyle().
@@ -73,7 +73,7 @@ func (m Model) View() string {
 	statusBar := lipgloss.NewStyle().
 		Foreground(theme.DimColor).
 		Padding(0, 1).
-		Render("cwd:"+m.cwd,"          •",selectedname,"         •",permissions,"         •[q]Quit")
+		Render("cwd:"+m.cwd,"    •",selectedname,"   •",permissions,"         •[q]Quit")
 		
 
 	return lipgloss.JoinVertical(lipgloss.Left, columns, statusBar)
@@ -99,15 +99,22 @@ func renderDirPane(p Pane, width, height int, active bool) string {
 	if p.Cursor >= offset+visible {
 		offset = p.Cursor - visible + 1
 	}
-
+indicatorwidth:=ansi.StringWidth(theme.CursorIndicator)
 	var b strings.Builder
 	for i := offset; i < len(p.Entries) && i < offset+visible; i++ {
 		e := p.Entries[i]
+
+		
+		if i==p.Cursor&&active{
+			pointer=theme.CursorIndicatorStyle.Render(theme.CursorIndicator)
+		}else{
+			pointer=theme.CursorIndicatorEmpty
+		}
 		fullpath:=filepath.Join(p.Path,e.Name)
 		iconprefix:=icons.ForPath(fullpath)
 		iconwidth:=ansi.StringWidth(iconprefix)
 
-		namewidth:=innerWidth-iconwidth
+		namewidth:=innerWidth-indicatorwidth-iconwidth
 		if namewidth<1{
 			namewidth=1
 		}
@@ -120,15 +127,21 @@ func renderDirPane(p Pane, width, height int, active bool) string {
 		truncatedName:=ansi.Truncate(name,namewidth,"...")
 		renderedname:=theme.EntryStyle(e.IsDir).Render(truncatedName)
 		line:=iconprefix+renderedname
-		if i == p.Cursor {
+		if i == p.Cursor&& active {
+			pointer =theme.CursorIndicatorStyle.Render(theme.CursorIndicator)
 			linewidth:=ansi.StringWidth(line)
-			if linewidth<innerWidth{
-				line+=strings.Repeat(" ",innerWidth-linewidth)
+			rem:=(innerWidth-indicatorwidth)-linewidth
+			if rem>0{
+				line+=strings.Repeat(" ",rem)
 			}
-			line=theme.CursorStyle.Render(line)
-		} 
+			
+			
+			line=theme.CursorIndicatorStyle.Render(line)
+		} else{
+			pointer=strings.Repeat(" ",indicatorwidth)
+		}
 
-		b.WriteString(line + "\n")
+		b.WriteString(pointer+line + "\n")
 	}
 
 	return theme.PaneStyle(width, height, active).Render(b.String())
