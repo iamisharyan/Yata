@@ -12,7 +12,10 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/bubbles/viewport"
 )
-
+type Style struct{
+	Icon string
+	Color string
+}
 
 type Pane struct {
 	Path    string

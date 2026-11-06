@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"term2/internal/icons"
 	"term2/internal/preview"
 	"term2/internal/theme"
 
@@ -102,17 +103,30 @@ func renderDirPane(p Pane, width, height int, active bool) string {
 	var b strings.Builder
 	for i := offset; i < len(p.Entries) && i < offset+visible; i++ {
 		e := p.Entries[i]
+		fullpath:=filepath.Join(p.Path,e.Name)
+		iconprefix:=icons.ForPath(fullpath)
+		iconwidth:=ansi.StringWidth(iconprefix)
+
+		namewidth:=innerWidth-iconwidth
+		if namewidth<1{
+			namewidth=1
+		}
+		
 		name := e.Name
 		if e.IsDir {
 			name += "/"
 		}
 
-		line := truncate(name, innerWidth)
+		truncatedName:=ansi.Truncate(name,namewidth,"...")
+		renderedname:=theme.EntryStyle(e.IsDir).Render(truncatedName)
+		line:=iconprefix+renderedname
 		if i == p.Cursor {
-			line = theme.CursorStyle.Render(line)
-		} else {
-			line = theme.EntryStyle(e.IsDir).Render(line)
-		}
+			linewidth:=ansi.StringWidth(line)
+			if linewidth<innerWidth{
+				line+=strings.Repeat(" ",innerWidth-linewidth)
+			}
+			line=theme.CursorStyle.Render(line)
+		} 
 
 		b.WriteString(line + "\n")
 	}
