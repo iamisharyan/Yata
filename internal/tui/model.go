@@ -8,6 +8,7 @@ import (
 
 	"term2/internal/fs"
 	"term2/internal/preview"
+	"github.com/charmbracelet/bubbles/textinput"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -39,6 +40,11 @@ type Model struct {
 	fileListY   int 
 	fullscreen  bool
 	previewX viewport.Model
+	fuzzyactive  bool
+	fuzzyinput   textinput.Model
+	fuzzyall     []fs.FuzzyItem
+	fuzzyfiltered []fs.FuzzyItem
+	fuzzycursor   int
 	
 }
 
@@ -46,10 +52,14 @@ type Model struct {
 func InitialModel() Model {
 	cwd, _ := os.Getwd()
 	vp:=viewport.New(0,0)
+	ti:=textinput.New()
+	ti.Placeholder="search files and dirs"
+	ti.Prompt=" \ued23 "
 	m := Model{
 		cwd:        cwd,
 		showHidden: false,
 		previewX: vp,
+		fuzzyinput: ti,
 	}
 	m.current = Pane{
 		Path:    cwd,

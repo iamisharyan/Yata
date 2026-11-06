@@ -14,6 +14,9 @@ import (
 )
 var pointer string
 func (m Model) View() string {
+	if m.fuzzyactive{
+		return m.renderFuzzyModal()
+	}
 	if m.fullscreen{
 		return lipgloss.NewStyle().
         Width(m.width).
@@ -219,4 +222,33 @@ func getpermissions(path string)string{
 	}
 	mode:=info.Mode().Perm()
 	return fmt.Sprintf("%s(%04o)",mode.String(),mode)
+}
+func (m Model)renderFuzzyModal()string{
+	mw:=max(m.width-10,40)
+	mh:=max(m.height-6,10)
+	var b strings.Builder
+	b.WriteString(m.fuzzyinput.View()+"\n\n")
+	mv:=mh-5
+	s:=0
+	if m.fuzzycursor>=mv{
+		s=m.fuzzycursor-mv+1
+	}
+	for i:=s;i<len(m.fuzzyfiltered)&&i<s+mv;i++{
+		item:=m.fuzzyfiltered[i]
+		l:=item.Relpath
+		if item.IsDir{
+			l+="/"
+		}
+		l=ansi.Truncate(l,mw-8,"...")
+
+		if i==m.fuzzycursor{
+			l=theme.CursorIndicatorStyle.Render("> ")+theme.CursorIndicatorStyle.Render(l)
+		}else{
+			l=" "+l
+		}
+		b.WriteString(l+"\n")
+	}
+	mb:=lipgloss.NewStyle().Width(mw).Height(mh).Border(lipgloss.RoundedBorder()).BorderForeground(theme.ActiveBorderColor).Padding(1,2).Render(b.String())
+
+	return lipgloss.Place(m.width,m.height,lipgloss.Center,lipgloss.Center,mb)
 }

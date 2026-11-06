@@ -1,13 +1,11 @@
 package tui
 
 import (
-	
 	"path/filepath"
 	"term2/internal/fs"
-	 tea "github.com/charmbracelet/bubbletea"
-	
-	
 
+	"github.com/charmbracelet/bubbles/textinput"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 // type editorFinishedMsg struct{
@@ -88,6 +86,84 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		key := msg.String()
+
+		if m.fuzzyactive{
+			switch key{
+			case "esc":
+				m.fuzzyactive=false
+				m.fuzzyinput.Blur()
+				return m,nil
+			case "down","ctrl+l":
+				if m.fuzzycursor<len(m.fuzzyfiltered)-1{
+					m.fuzzycursor++
+				}
+				return m,nil
+			case "up","ctrl+k":
+				if m.fuzzycursor>0{
+					m.fuzzycursor--
+				}
+				return m,nil
+			case "enter","=":
+				if len(m.fuzzyfiltered)==0||m.fuzzycursor>=len(m.fuzzyfiltered){
+					
+				return m,nil
+			}
+					target:=m.fuzzyfiltered[m.fuzzycursor]
+					fullpath:=filepath.Join(m.cwd,target.Relpath)
+					m.fuzzyactive=false
+					m.fuzzyinput.Blur()
+
+					if target.IsDir{
+						m.cwd=fullpath
+						m.current=Pane{
+							Path:  fullpath,
+							Entries: m.filterEntries(fs.ReadDir(fullpath)),
+							Cursor: 0,
+						}
+						return m.RefreshPanes()
+					}
+					td:=filepath.Dir(fullpath)
+					tf:=filepath.Base(fullpath)
+					m.cwd=td
+					m.current=Pane{
+						Path:td,
+						Entries: m.filterEntries(fs.ReadDir(td)),
+						Cursor: 0,
+					}
+
+						for i,e:=range m.current.Entries{
+							if e.Name==tf{
+								m.current.Cursor=i
+								break
+							}
+						}
+						var cmd tea.Cmd
+						m,cmd=m.RefreshPanes()
+						m.fullscreen=true
+						m.resizepreview()
+						return m,tea.Batch(cmd,loadPreviewCmd(fullpath))
+						
+					}
+					
+				
+			
+			var tiCmd tea.Cmd
+			m.fuzzyinput,tiCmd=m.fuzzyinput.Update(msg)
+			m.fuzzyfiltered=fs.FuzzySearch(m.fuzzyinput.Value(),m.fuzzyall)
+			m.fuzzycursor=0
+			return m,tiCmd
+		}
+		switch key{
+		case "/":
+			m.fuzzyactive=true
+			m.fuzzyinput.Reset()
+			m.fuzzyinput.Focus()
+			m.fuzzyall=fs.CollectFiles(m.cwd,m.showHidden)
+			m.fuzzyfiltered=m.fuzzyall
+			m.fuzzycursor=0
+			return m,textinput.Blink
+		}
+		
 
 		if m.fullscreen {
     switch key {
