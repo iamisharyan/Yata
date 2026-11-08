@@ -3,6 +3,7 @@ package tui
 import (
 	"path/filepath"
 	"term2/internal/fs"
+	"term2/internal/ops"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -45,6 +46,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.Button{
 		case tea.MouseButtonWheelDown:
 			m.previewX.ScrollDown(3)
+			
 		case tea.MouseButtonWheelUp:
 			m.previewX.ScrollUp(3)
 		case tea.MouseButtonLeft:
@@ -59,7 +61,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case tea.MouseButtonRight:
 			
-
 
 			if msg.Action==tea.MouseActionPress{
 				crow:=msg.Y-m.fileListY
@@ -86,6 +87,42 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		key := msg.String()
+if m.renaming{
+	switch msg.String(){
+	case "enter":
+		selected:=m.current.Entries[m.current.Cursor]
+		src:=filepath.Join(m.cwd,selected.Name)
+
+		_,err:=ops.Rename(src,m.renameInput)
+		if err!=nil{
+			return m,nil
+		}else{
+			m.RefreshPanes()
+		}
+		m.renaming=false
+		m.renameInput=""
+		return m,nil
+
+	case "esc":
+		m.renaming=false
+		m.renameInput=""
+		return m,nil
+	case "backspace":
+		runes:=[]rune(m.renameInput)
+		if len(runes)>0{
+			m.renameInput=string(runes[:len(runes)-1])
+		}
+		return m,nil
+	default:
+		key:=msg.String()
+		if len([]rune(key))==1{
+			m.renameInput+=key
+		}
+		return m,nil
+
+	}
+	
+}
 
 		if m.fuzzyactive{
 			switch key{
@@ -215,6 +252,46 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.resizepreview()
 				return m,nil
 			}
+			//file operations
+		case "c":
+			if len(m.current.Entries)==0{
+				return m,nil
+			}
+			selected:=m.current.Entries[m.current.Cursor]
+			path:=filepath.Join(m.cwd,selected.Name)
+			m.clipboard.Set(path,ops.Copy)
+		case "x":
+			if len(m.current.Entries)==0{
+				return m,nil
+			}
+			selected:=m.current.Entries[m.current.Cursor]
+			path:=filepath.Join(m.cwd,selected.Name)
+			m.clipboard.Set(path,ops.Cut)
+		case "p":
+			if m.clipboard.Source==""{
+				return m,nil
+			}
+			_,err:=ops.Paste(
+				m.clipboard.Source,
+				m.cwd,
+				m.clipboard.Mode,
+			)
+			if err!=nil{
+				return m,nil
+			}
+			if m.clipboard.Mode==ops.Cut{
+				m.clipboard.Clear()
+			}
+			m.RefreshPanes()
+		case "r":
+			if len(m.current.Entries)==0{
+				return m,nil
+			}
+			selected:=m.current.Entries[m.current.Cursor]
+			m.renaming=true
+			m.renameInput=selected.Name
+
+
 		case "q", "ctrl+c":
 			return m, tea.Quit
 

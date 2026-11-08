@@ -14,6 +14,7 @@ import (
 )
 var pointer string
 func (m Model) View() string {
+	
 	if m.fuzzyactive{
 		return m.renderFuzzyModal()
 	}
@@ -76,8 +77,37 @@ func (m Model) View() string {
 	statusBar := lipgloss.NewStyle().
 		Foreground(theme.DimColor).
 		Padding(0, 1).
-		Render("cwd:"+m.cwd,"    •",selectedname,"   •",permissions,"         •[q]Quit")
-		
+		Render("cwd:"+m.cwd,"•",selectedname,"   •",permissions,"         •[q]Quit")
+// if m.renaming {
+//     renameContent := lipgloss.JoinVertical(
+//         lipgloss.Left,
+//         lipgloss.NewStyle().
+//             Bold(true).
+//             Render("Rename File"),
+//         "",
+//         m.renameInput.View(),
+//         "",
+//         lipgloss.NewStyle().
+//             Foreground(theme.DimColor).
+//             Render("Enter: Confirm |Esc: Cancel"),
+//     )
+
+//     renameBox := lipgloss.NewStyle().
+//         Border(lipgloss.RoundedBorder()).
+//         BorderForeground(theme.ActiveBorderColor).
+//         Padding(1, 2).
+//         Width(45).
+//         Render(renameContent)
+
+//     return lipgloss.Place(
+//         m.width,
+//         m.height,
+//         lipgloss.Center,
+//         lipgloss.Center,
+//         renameBox,
+//     )
+
+// }
 
 	return lipgloss.JoinVertical(lipgloss.Left, columns, statusBar)
 

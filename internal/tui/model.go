@@ -7,11 +7,14 @@ import (
 	"strings"
 
 	"term2/internal/fs"
+	"term2/internal/ops"
 	"term2/internal/preview"
+
+	
 	"github.com/charmbracelet/bubbles/textinput"
 
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/bubbles/viewport"
+	tea "github.com/charmbracelet/bubbletea"
 )
 type Style struct{
 	Icon string
@@ -45,7 +48,9 @@ type Model struct {
 	fuzzyall     []fs.FuzzyItem
 	fuzzyfiltered []fs.FuzzyItem
 	fuzzycursor   int
-	
+	clipboard ops.Clipboard
+	renaming bool
+	renameInput  string
 }
 
 
