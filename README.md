@@ -136,6 +136,3 @@ Pressing `n` on a file opens it depending on its type:
 
 Issues and pull requests are welcome. Fork the repo, create a feature branch, and open a PR describing your change.
 
-## License
-
-No license file has been added to this repository yet. Add one (for example MIT) and update this section.
