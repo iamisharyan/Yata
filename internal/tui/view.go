@@ -30,6 +30,13 @@ func (m Model) View() string {
 	if m.width == 0 || m.height == 0 {
 		return "Loading..."
 	}
+	if m.screen == SplashScreen {
+    return renderSplash(
+        m.width,
+        m.height,
+        m.menuCursor,
+    )
+}
 
 	colWidth:=m.width/3
 	if colWidth<10 {

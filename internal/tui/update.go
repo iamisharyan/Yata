@@ -19,7 +19,40 @@ func (m Model) Init() tea.Cmd {
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
+if m.screen == SplashScreen {
+    switch msg := msg.(type) {
 
+    case tea.WindowSizeMsg:
+        m.width = msg.Width
+        m.height = msg.Height
+        m.resizepreview()
+        return m, nil
+
+    case tea.KeyMsg:
+        switch msg.String() {
+
+        case "up", "k":
+            m.menuCursor = 0
+
+        case "down", "j":
+            m.menuCursor = 1
+
+        case "enter":
+            if m.menuCursor == 0 {
+                m.screen = FileManagerScreen
+                m, cmd = m.RefreshPanes()
+                return m, cmd
+            }
+
+            return m, tea.Quit
+
+        case "q", "esc", "ctrl+c":
+            return m, tea.Quit
+        }
+    }
+
+    return m, nil
+}
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width

@@ -3,8 +3,7 @@ module term2
 go 1.26.0
 
 require (
-	charm.land/bubbles/v2 v2.2.1
-	charm.land/lipgloss/v2 v2.0.6
+
 	github.com/alecthomas/chroma/v2 v2.27.0
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
@@ -16,7 +15,7 @@ require (
 )
 
 require (
-	charm.land/bubbletea/v2 v2.0.8 // indirect
+
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect

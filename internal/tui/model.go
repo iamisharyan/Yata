@@ -27,7 +27,11 @@ type Pane struct {
 	Cursor  int
 	Offset  int
 }
-
+type Screen int
+const(
+	SplashScreen Screen=iota
+	FileManagerScreen
+)
 
 type Model struct {
 	cwd         string
@@ -53,6 +57,8 @@ type Model struct {
 	renameInput  string
 	statusmessage string
 	notifID       uint64
+    screen        Screen
+	menuCursor    int
 
 	
 }
@@ -70,6 +76,8 @@ func InitialModel() Model {
 		showHidden: false,
 		previewX: vp,
 		fuzzyinput: ti,
+		screen:SplashScreen,
+		menuCursor: 0,
 	}
 	m.current = Pane{
 		Path:    cwd,
