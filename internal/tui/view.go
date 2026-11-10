@@ -78,38 +78,74 @@ func (m Model) View() string {
 		Foreground(theme.DimColor).
 		Padding(0, 1).
 		Render("cwd:"+m.cwd,"•",selectedname,"   •",permissions,"         •[q]Quit")
-// if m.renaming {
-//     renameContent := lipgloss.JoinVertical(
-//         lipgloss.Left,
-//         lipgloss.NewStyle().
-//             Bold(true).
-//             Render("Rename File"),
-//         "",
-//         m.renameInput.View(),
-//         "",
-//         lipgloss.NewStyle().
-//             Foreground(theme.DimColor).
-//             Render("Enter: Confirm |Esc: Cancel"),
-//     )
+if m.renaming {
+    title := lipgloss.NewStyle().
+        Bold(true).
+        Foreground(lipgloss.Color("#00D7AF")).
+        Render("Rename File")
 
-//     renameBox := lipgloss.NewStyle().
-//         Border(lipgloss.RoundedBorder()).
-//         BorderForeground(theme.ActiveBorderColor).
-//         Padding(1, 2).
-//         Width(45).
-//         Render(renameContent)
+    input := lipgloss.NewStyle().
+        Foreground(lipgloss.Color("#FFFFFF")).
+        Background(lipgloss.Color("#262626")).
+        Padding(0, 1).
+        Width(40).
+        Render(m.renameInput + "█")
 
-//     return lipgloss.Place(
-//         m.width,
-//         m.height,
-//         lipgloss.Center,
-//         lipgloss.Center,
-//         renameBox,
-//     )
+    help := lipgloss.NewStyle().
+        Foreground(theme.DimColor).
+        Render("ENTER: Confirm    ESC: Cancel")
 
-// }
+    content := lipgloss.JoinVertical(
+        lipgloss.Left,
+        title,
+        "",
+        input,
+        "",
+        help,
+    )
 
-	return lipgloss.JoinVertical(lipgloss.Left, columns, statusBar)
+    modal := lipgloss.NewStyle().
+        Border(lipgloss.RoundedBorder()).
+        BorderForeground(theme.ActiveBorderColor).
+        Padding(1, 2).
+        Width(46).
+        Render(content)
+
+    return lipgloss.Place(
+        m.width,
+        m.height,
+        lipgloss.Center,
+        lipgloss.Center,
+        modal,
+    )
+}
+	mainView := lipgloss.JoinVertical(
+    lipgloss.Left,
+    columns,
+    statusBar,
+)
+
+if m.statusmessage != "" {
+    toast := lipgloss.NewStyle().
+        Foreground(lipgloss.Color("#FFFFFF")).
+        Background(lipgloss.Color("#168B72")).
+        Bold(true).
+        Padding(0, 2).
+       Border(lipgloss.RoundedBorder()).
+        Render(m.statusmessage)
+
+    return lipgloss.JoinVertical(
+        lipgloss.Left,
+        mainView,
+        lipgloss.PlaceHorizontal(
+            m.width,
+            lipgloss.Center,
+            toast,
+        ),
+    )
+}
+
+return mainView
 
 }
 

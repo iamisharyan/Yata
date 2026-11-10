@@ -10,8 +10,8 @@ import (
 	"term2/internal/ops"
 	"term2/internal/preview"
 
-	
 	"github.com/charmbracelet/bubbles/textinput"
+	
 
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -51,10 +51,15 @@ type Model struct {
 	clipboard ops.Clipboard
 	renaming bool
 	renameInput  string
+	statusmessage string
+	notifID       uint64
+
+	
 }
 
 
 func InitialModel() Model {
+	
 	cwd, _ := os.Getwd()
 	vp:=viewport.New(0,0)
 	ti:=textinput.New()

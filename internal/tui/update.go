@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"term2/internal/fs"
 	"term2/internal/ops"
-
+"strings"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -71,7 +71,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 		return m ,nil
-
+case notificationMsg:
+    if msg.id == m.notifID {
+        m.statusmessage = ""
+    }
+    return m, nil
 	case previewLoadedMsg:
 		if msg.path == m.SelectedPath() {
 			if msg.err != nil {
@@ -89,19 +93,51 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		key := msg.String()
 if m.renaming{
 	switch msg.String(){
-	case "enter":
-		selected:=m.current.Entries[m.current.Cursor]
-		src:=filepath.Join(m.cwd,selected.Name)
+	
+		// selected:=m.current.Entries[m.current.Cursor]
+		// src:=filepath.Join(m.cwd,selected.Name)
 
-		_,err:=ops.Rename(src,m.renameInput)
-		if err!=nil{
-			return m,nil
-		}else{
-			m.RefreshPanes()
-		}
-		m.renaming=false
-		m.renameInput=""
-		return m,nil
+		// _,err:=ops.Rename(src,m.renameInput)
+		// if err!=nil{
+		// 	return m,nil
+		// }else{
+		// 	m.RefreshPanes()
+		// }
+		// m.renaming=false
+		// m.renameInput=""
+		// return m,nil
+		case "enter":
+    if len(m.current.Entries) == 0 {
+        m.renaming = false
+        return m, nil
+    }
+
+    newName := strings.TrimSpace(m.renameInput)
+
+    if newName == "" {
+        return m, m.Notify("✗ Filename cannot be empty")
+    }
+
+    selected := m.current.Entries[m.current.Cursor]
+    oldName := selected.Name
+
+    src := filepath.Join(m.cwd, oldName)
+
+    _, err := ops.Rename(src, newName)
+
+    if err != nil {
+        return m, m.Notify("✗ Rename failed: " + err.Error())
+    }
+
+    m.renaming = false
+    m.renameInput = ""
+
+    m, cmd = m.RefreshPanes()
+
+    return m, tea.Batch(
+        cmd,
+        m.Notify("✓ Renamed: " + newName),
+    )
 
 	case "esc":
 		m.renaming=false
@@ -260,6 +296,7 @@ if m.renaming{
 			selected:=m.current.Entries[m.current.Cursor]
 			path:=filepath.Join(m.cwd,selected.Name)
 			m.clipboard.Set(path,ops.Copy)
+			 return m, m.Notify("✓  Copied: " + selected.Name)
 		case "x":
 			if len(m.current.Entries)==0{
 				return m,nil
@@ -267,6 +304,7 @@ if m.renaming{
 			selected:=m.current.Entries[m.current.Cursor]
 			path:=filepath.Join(m.cwd,selected.Name)
 			m.clipboard.Set(path,ops.Cut)
+			return m, m.Notify("✂  Cut: " + selected.Name)
 		case "p":
 			if m.clipboard.Source==""{
 				return m,nil
@@ -277,12 +315,16 @@ if m.renaming{
 				m.clipboard.Mode,
 			)
 			if err!=nil{
-				return m,nil
+				return  m, m.Notify("✗  Paste failed: " + err.Error())
 			}
 			if m.clipboard.Mode==ops.Cut{
 				m.clipboard.Clear()
 			}
-			m.RefreshPanes()
+			m,cmd=m.RefreshPanes()
+			return m,tea.Batch(
+				cmd,
+				m.Notify("pasted:"),
+			)
 		case "r":
 			if len(m.current.Entries)==0{
 				return m,nil
