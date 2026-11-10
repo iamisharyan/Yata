@@ -2,16 +2,6 @@
 
 A fast, keyboard-driven **terminal file manager written in Go**, built on the [Bubble Tea](https://github.com/charmbracelet/bubbletea) TUI framework. Yata gives you a Miller-columns layout (parent · current · preview), fuzzy file search, file-type icons, and a built-in file preview, all without leaving your terminal.
 
-## ⚡ Performance
-
-<p align="center">
-  <img src="assets/benchmark.svg" alt="Searching and loading 100,000 files: Windows File Explorer ~15 s, Yata 40–100 ms" width="720">
-</p>
-
-On a folder of **100,000 files**, Windows File Explorer takes around **15 seconds** to search and load, while Yata does the same in **40–100 ms**. That is roughly **150× to 375× faster**.
-
-> These timings were measured by the author on a single Windows machine, so results will vary with hardware, disk and folder contents.
-
 ## Features
 
 - **Three-pane layout**: parent directory, current directory and a live preview of the selected file or folder
