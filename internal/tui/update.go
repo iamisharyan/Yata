@@ -124,6 +124,30 @@ case notificationMsg:
 
 	case tea.KeyMsg:
 		key := msg.String()
+
+		if m.confdel{
+			switch msg.String(){
+			case "enter","y":
+				err:=ops.Delete(m.delpath)
+				if err!=nil{
+					m.statusmessage="delete failed:"+err.Error()
+				}else{
+					m.statusmessage="deleted:"+m.delname
+				}
+				m.confdel=false
+				m.delpath=""
+				m.delname=""
+				m.RefreshPanes()
+
+			case "esc":
+				m.confdel=false
+				m.delpath=""
+				m.delname=""
+				m.statusmessage="deletion cancelled"
+
+			}
+			return m,nil
+		}
 if m.renaming{
 	switch msg.String(){
 	
@@ -358,6 +382,15 @@ if m.renaming{
 				cmd,
 				m.Notify("pasted:"),
 			)
+		case "d":
+			if len(m.current.Entries)==0{
+				return m,nil
+			}
+			selected:=m.current.Entries[m.current.Cursor]
+			m.delpath=selected.Name
+			m.confdel=true
+
+			
 		case "r":
 			if len(m.current.Entries)==0{
 				return m,nil

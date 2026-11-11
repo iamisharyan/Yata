@@ -59,6 +59,9 @@ type Model struct {
 	notifID       uint64
     screen        Screen
 	menuCursor    int
+	confdel       bool
+	delpath       string
+	delname       string
 
 	
 }

@@ -99,3 +99,13 @@ func Rename(src,newName string)(string,error){
 	return "",errors.New("unsupported file type")
 
 }
+func Delete(path string)error{
+	info,err:=os.Lstat(path)
+	if err!=nil{
+		return fmt.Errorf("cannot access file:%w",err)
+	}
+	if info.IsDir(){
+	return os.RemoveAll(path)
+}
+return os.Remove(path)
+}
