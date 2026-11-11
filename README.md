@@ -1,4 +1,6 @@
 # Yata
+<img width="774" height="545" alt="Screenshot 2026-11-11 032120" src="https://github.com/user-attachments/assets/75a1a274-cfef-4e5f-a37b-0351e351cebd" />
+
 
 A fast, keyboard-driven **terminal file manager written in Go**, built on the [Bubble Tea](https://github.com/charmbracelet/bubbletea) TUI framework. Yata gives you a Miller-columns layout (parent · current · preview), fuzzy file search, file-type icons, and a built-in file preview, all without leaving your terminal.
 
